@@ -7,10 +7,11 @@
 #include "InitialConditions.h"
 #include "Boundaries.h"
 
+
 int main() {
     try {
         // Definir parámetros
-        int N = 3000;          // Número de partículas
+        int N = 400;          // Número de partículas
         double x_min = -0.5;
         double x_max =  0.5;
         BoundaryType boundaryType = BoundaryType::FIXED; 
@@ -21,11 +22,12 @@ int main() {
 
         // Aquí es donde escoges el tipo de condición inicial que quieres:
         initialConditions->setInitialConditionType(InitialConditionType::TEST_RSOD);
-        // TEST_TRANS_VEL  
-        // TEST_RSOD  
-        // TEST_RSOD2  
-        // TEST_PERTURB_SIN  
-        // TEST_SB
+        // TEST_RSOD          t = 0.35
+        // TEST_RSOD2         t = 0.35
+        // TEST_RSOD2         t = 0.2
+        // TEST_TRANS_VEL     t = 0.35
+        // TEST_PERTURB_SIN   t = 0.45
+        // TEST_SB            t = 0.2  
 
 
         double GAMMA = 5.0/3.0;
@@ -44,7 +46,7 @@ int main() {
         double fixed_h = 0.009;      
         bool use_fixed_h = false;
 
-        double endTime = 0.36;
+        double endTime = 0.3;
 
         // Crear la simulación con todos los objetos necesarios
         Simulation sim(kernel, eos, dissipation, initialConditions,

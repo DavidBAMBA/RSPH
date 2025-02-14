@@ -42,8 +42,6 @@ def plot_data(filename):
     axs[0, 1].set_xlabel('Posición x')
     axs[0, 1].set_ylabel('Presión')
     axs[0, 1].set_xlim(0.0, 1.0)
-    #axs[0, 1].set_xlim(1.0, 2.0)
-    #axs[0, 1].set_ylim(0.5, 1.5)
 
     axs[0, 1].legend()
 
@@ -53,7 +51,6 @@ def plot_data(filename):
     axs[1, 0].set_title(f'Energía Interna vs Posición\nPaso {step}, Tiempo {time:.4f}')
     axs[1, 0].set_xlabel('Posición x')
     axs[1, 0].set_ylabel('Energía Interna')
-    #axs[1, 0].set_xlim(1.0, 2.0)
     axs[1, 0].set_xlim(0.0, 1.0)
     axs[1, 0].legend()
 

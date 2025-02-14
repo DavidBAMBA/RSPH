@@ -14,6 +14,8 @@
 #include <iterator>
 #include <sstream>
 #include "Globals.h"
+#include <chrono>
+
 
 std::unique_ptr<Logger> g_logger;  // Definición única
 
@@ -210,7 +212,7 @@ void Simulation::integrateState(std::vector<Particle>& state, double dt, bool us
 // Integrador de orden dos (RK2) para el control de dt
 //------------------------------------------------------------
 void Simulation::rungeKutta2Step(double timeStep, VariableConverter& converter) {
-    g_logger->log("[RK2] Iniciando paso RK2 con dt = " + std::to_string(timeStep) + "\n");
+    //g_logger->log("[RK2] Iniciando paso RK2 con dt = " + std::to_string(timeStep) + "\n");
 
     size_t numParticles = particles.size();
     std::vector<std::array<double, 3>> S0(numParticles);
@@ -225,7 +227,7 @@ void Simulation::rungeKutta2Step(double timeStep, VariableConverter& converter) 
         pos0[i] = particles[i].position;
         vel0[i] = particles[i].velocity;
     }
-    g_logger->log("[RK2] Estado inicial guardado para " + std::to_string(numParticles) + " partículas.\n");
+    //g_logger->log("[RK2] Estado inicial guardado para " + std::to_string(numParticles) + " partículas.\n");
 
     std::vector<std::array<double, 3>> k1S(numParticles);
     std::vector<double> k1E(numParticles);
@@ -241,7 +243,7 @@ void Simulation::rungeKutta2Step(double timeStep, VariableConverter& converter) 
         }
         k1E[i] = timeStep * particles[i].energyChangeRate;
     }
-    g_logger->log("[RK2] k1 calculado.\n");
+    //g_logger->log("[RK2] k1 calculado.\n");
 
     std::vector<Particle> tempState = particles;
 
@@ -263,7 +265,7 @@ void Simulation::rungeKutta2Step(double timeStep, VariableConverter& converter) 
         tempState[i].updatePressure(*eos);
         converter.conservedToPrimitives(tempState[i], *eos);
     }
-    g_logger->log("[RK2] Estado temporal u^(temp) calculado.\n");
+    //g_logger->log("[RK2] Estado temporal u^(temp) calculado.\n");
     //stabilizeHighVariables();
 
     #pragma omp parallel for
@@ -285,7 +287,7 @@ void Simulation::rungeKutta2Step(double timeStep, VariableConverter& converter) 
         }
         k2E[i] = timeStep * tempState[i].energyChangeRate;
     }
-    g_logger->log("[RK2] k2 calculado.\n");
+    //g_logger->log("[RK2] k2 calculado.\n");
 
     #pragma omp parallel for
     for (size_t i = 0; i < numParticles; ++i) {
@@ -296,7 +298,7 @@ void Simulation::rungeKutta2Step(double timeStep, VariableConverter& converter) 
         }
         particles[i].specificEnergy = E0[i] + 0.5 * (k1E[i] + k2E[i]);
     }
-    g_logger->log("[RK2] Estado final calculado con RK2.\n");
+    //g_logger->log("[RK2] Estado final calculado con RK2.\n");
 
 
     boundaries.apply(particles);
@@ -306,14 +308,14 @@ void Simulation::rungeKutta2Step(double timeStep, VariableConverter& converter) 
         particles[i].updatePressure(*eos);
         converter.conservedToPrimitives(particles[i], *eos);
     }
-    g_logger->log("[RK2] Conversión final y actualizaciones completadas.\n");
+    //g_logger->log("[RK2] Conversión final y actualizaciones completadas.\n");
     //stabilizeHighVariables();
     #pragma omp parallel for
     for (size_t i = 0; i < numParticles; ++i) {
         converter.primitivesToConserved(particles[i], *eos);
     }
     time += timeStep;
-    g_logger->log("[RK2] Paso RK2 completado. Tiempo actualizado a " + std::to_string(time) + "\n");
+    //g_logger->log("[RK2] Paso RK2 completado. Tiempo actualizado a " + std::to_string(time) + "\n");
 }
 
 //------------------------------------------------------------
@@ -465,6 +467,10 @@ void Simulation::rungeKuttaTVD3Step(double timeStep, VariableConverter& converte
 // Método run(): ciclo principal de la simulación
 //------------------------------------------------------------
 void Simulation::run(double endTime) {
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    
     // Inicializar el logger global (escribe en "simulation_log.txt")
     g_logger = std::make_unique<Logger>("simulation_log.txt");
 
@@ -496,9 +502,9 @@ void Simulation::run(double endTime) {
             writeOutputCSV(filename);
         }
 
-        double dt = calculateTimeStep();
+        double dt = calculateTimeStep()/10.0;
         //double dt2 = calculateTimeStep2();
-        //double dt = std::min(dt1,1.0e-8);
+        //double dt = std::min(dt1,dt2);
         int retries = 0;
         bool stepAccepted = false;
         std::vector<Particle> backupParticles = particles;
@@ -529,22 +535,26 @@ void Simulation::run(double endTime) {
         } else {
             current_time += dt;
             step++;
-            double totalMass = computeTotalMass();
-            double totalEnergy = computeTotalEnergy();
+            //double totalMass = computeTotalMass();
+            //double totalEnergy = computeTotalEnergy();
 
-            std::ostringstream logMessage;
+/*             std::ostringstream logMessage;
             logMessage << "---------------------------------------------------------------------------\n"
                        << " \t STEP: " << step 
                        << "\t dt: " << dt 
                        << "\t time: " << current_time << "\n"
-                       << " \t -> Total Mass:   " << totalMass << "\n"
-                       << " \t -> Total Energy: " << totalEnergy << "\n"
                        << "---------------------------------------------------------------------------\n";
-            std::string msg = logMessage.str();
-            std::cout << msg;
-            g_logger->log(msg);
+            std::string msg = logMessage.str(); */
+            //std::cout << msg;
+            //g_logger->log(msg);
 
+            std::cout  << "---------------------------------------------------------------------------\n"
+                       << " \t STEP: " << step 
+                       << "\t dt: " << dt 
+                       << "\t time: " << current_time << "\n"
+                       << "---------------------------------------------------------------------------\n";
             // Guardar invariantes en un archivo aparte
+
             appendInvariantsToFile("invariants.txt", current_time, step);
 
             retries = 0;
@@ -556,6 +566,10 @@ void Simulation::run(double endTime) {
     std::cout << completion_msg;
     g_logger->log(completion_msg);
     g_logger.reset();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+
+    std::cout << "Tiempo de ejecución: " << elapsed.count() << " segundos" << std::endl;
 }
 
 

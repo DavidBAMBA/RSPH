@@ -13,6 +13,7 @@
 enum class InitialConditionType {
     TEST_RSOD,
     TEST_RSOD2,
+    TEST_RSOD3,
     TEST_SB,
     TEST_PERTUB_SIN,
     TEST_TRANS_VEL,

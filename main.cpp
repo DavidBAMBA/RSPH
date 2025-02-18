@@ -11,9 +11,9 @@
 int main() {
     try {
         // Definir parámetros
-        int N = 400;          // Número de partículas
-        double x_min = -0.5;
-        double x_max =  0.5;
+        int N = 800;          // Número de partículas
+        double x_min = -0.4;
+        double x_max =  0.4;
         BoundaryType boundaryType = BoundaryType::FIXED; 
         // Otras opciones: BoundaryType::FIXED, BoundaryType::OPEN
 
@@ -21,7 +21,7 @@ int main() {
         auto initialConditions = std::make_shared<InitialConditions>();
 
         // Aquí es donde escoges el tipo de condición inicial que quieres:
-        initialConditions->setInitialConditionType(InitialConditionType::TEST_RSOD);
+        initialConditions->setInitialConditionType(InitialConditionType::TEST_SB);
         // TEST_RSOD          t = 0.35
         // TEST_RSOD2         t = 0.35
         // TEST_RSOD2         t = 0.2
@@ -46,7 +46,7 @@ int main() {
         double fixed_h = 0.009;      
         bool use_fixed_h = false;
 
-        double endTime = 0.3;
+        double endTime = 0.35;
 
         // Crear la simulación con todos los objetos necesarios
         Simulation sim(kernel, eos, dissipation, initialConditions,

@@ -71,6 +71,7 @@ private:
     double computeTotalEnergy() const;
     double computeTotalMass() const;
     void appendInvariantsToFile(const std::string& filename, double currentTime, int step) const;
+    std::vector<const Particle*> findNeighbors(const Particle& p) const;
 
 };
 

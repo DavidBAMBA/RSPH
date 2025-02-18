@@ -140,7 +140,7 @@ std::pair<double, double> DissipationTerms::Viscosity_LiptaiPrice2018(const Part
     double v_sig_b = ( cs_b + std::fabs(v_ab_star) ) / (1.0 + cs_b * std::fabs(v_ab_star)) ;
 
     // Término disipativo Pi_ab
-    double ALPHA = 1.0;
+    double ALPHA = 0.5;
     double q_a =  0.5 * ALPHA * N_a * v_sig_a * entalpy_a * S_ab_start;
     double q_b =  0.5 * ALPHA * N_b * v_sig_b * entalpy_b * S_ab_start;
         
@@ -192,7 +192,8 @@ std::pair<double, double> DissipationTerms::Conductivity_LiptaiPrice2018(const P
     double v_sig_a = ( cs_a + std::fabs(v_ab_star) ) / (1.0 + cs_a * std::fabs(v_ab_star)) ;
     double v_sig_b = ( cs_b + std::fabs(v_ab_star) ) / (1.0 + cs_b * std::fabs(v_ab_star)) ;
 
-    double ALPHA_u = 0.1;
+    double v_sig_u = std::min(1.0, std::sqrt( std::fabs(a.pressure - b.pressure)/ (0.5 * (a.density + b.density))) );
+    double ALPHA_u = 0.2;
     double Omega_a = 0.5 * ALPHA_u * u_moña_ab * v_sig_a / N_a ;
     double Omega_b = 0.5 * ALPHA_u * u_moña_ab * v_sig_b / N_b ;
 

@@ -29,36 +29,33 @@ void Boundaries::applyPeriodic(std::vector<Particle>& particles) {
 }
 
 void Boundaries::applyFixed(std::vector<Particle>& particles) {
-    // Variables para identificar las partículas fantasma más extremas
-    Particle* leftMostGhost = nullptr;
-    Particle* rightMostGhost = nullptr;
-
-    // Buscar las partículas fantasma más extremas
+    // Recolectar todas las partículas fantasma
+    std::vector<Particle*> ghostParticles;
     for (auto& p : particles) {
-        if (!p.isGhost) continue; // Sólo aplicamos a partículas fantasma
-
-        if (p.position[0] < x_min_) {
-            // Buscar la partícula con posición más pequeña (extremo izquierdo)
-            if (!leftMostGhost || p.position[0] < leftMostGhost->position[0]) {
-                leftMostGhost = &p;
-            }
-        } else if (p.position[0] > x_max_) {
-            // Buscar la partícula con posición más grande (extremo derecho)
-            if (!rightMostGhost || p.position[0] > rightMostGhost->position[0]) {
-                rightMostGhost = &p;
-            }
-        }
+        if (p.isGhost)
+            ghostParticles.push_back(&p);
     }
 
-    // Aplicar condiciones de frontera a las partículas fantasma más extremas
-    if (leftMostGhost) {
-        leftMostGhost->velocity = {0.0, 0.0, 0.0}; // Fijar velocidad
-        leftMostGhost->position[0] = leftMostGhost->position[0]; // Opcional, mantener posición fija
+    // Ordenar las partículas fantasma por posición en x (de menor a mayor)
+    std::sort(ghostParticles.begin(), ghostParticles.end(), [](const Particle* a, const Particle* b) {
+        return a->position[0] < b->position[0];
+    });
+
+    // Fijar las 5 partículas más a la izquierda
+    size_t numLeft = std::min<size_t>(5, ghostParticles.size());
+    for (size_t i = 0; i < numLeft; ++i) {
+        Particle* ghost = ghostParticles[i];
+        ghost->velocity = {0.0, 0.0, 0.0}; // Fijar la velocidad a cero
+        // Se puede ajustar la posición u otra variable si fuera necesario.
     }
 
-    if (rightMostGhost) {
-        rightMostGhost->velocity = {0.0, 0.0, 0.0}; // Fijar velocidad
-        rightMostGhost->position[0] = rightMostGhost->position[0]; // Opcional, mantener posición fija
+    // Fijar las 5 partículas más a la derecha
+    size_t totalGhosts = ghostParticles.size();
+    size_t numRight = std::min<size_t>(5, ghostParticles.size());
+    for (size_t i = 0; i < numRight; ++i) {
+        Particle* ghost = ghostParticles[totalGhosts - 1 - i];
+        ghost->velocity = {0.0, 0.0, 0.0}; // Fijar la velocidad a cero
+        // Se puede ajustar la posición u otra variable si fuera necesario.
     }
 }
 

@@ -61,7 +61,7 @@ double DensityUpdater::calculateDensity(const Particle& particle, const std::vec
 // ========================
 double DensityUpdater::calculateOmega(const Particle& particle, const std::vector<Particle>& neighbors, double h, double rho, const Kernel& kernel) const {
     double sum_m_dWdh = 0.0;
-    #pragma omp parallel for reduction(+:sum_m_dWdh)
+    //#pragma omp parallel for reduction(+:sum_m_dWdh)
     for (const auto& neighbor : neighbors) {
         std::array<double, 3> r_ab = {
             particle.position[0] - neighbor.position[0],

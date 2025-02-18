@@ -6,7 +6,7 @@
 #include "VariableConverter.h"
 
 
-InitialConditions::InitialConditions() : icType(InitialConditionType::TEST_PERTUB_SIN) {}
+InitialConditions::InitialConditions() : icType(InitialConditionType::TEST_SB) {}
 
 void InitialConditions::setInitialConditionType(InitialConditionType type) {
     icType = type;
@@ -57,7 +57,7 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
 
         // Elegimos un ancho de transición, por ejemplo la mitad
         double avg_dx = 0.5 * (dx_left + dx_right);
-        double transition_length = 1.0* avg_dx; // Ajusta según te convenga
+        double transition_length = 1.0 * avg_dx; // Ajusta según te convenga
 
         // Función suave para densidad:
         auto smoothDensity = [&](double x) {
@@ -94,7 +94,7 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
             double dens = smoothDensity(x); //density_left;//(x);
             double pres = smoothPressure(x); //pressure_left;//(x);
 
-            particles.push_back(createParticle(x, dens, pres, 1.2 * mass_per_particle/density_left));
+            particles.push_back(createParticle(x, dens, pres, 1.4 * mass_per_particle/density_left));
         }
 
         // Partículas en el lado derecho (incluyendo dominio extendido)
@@ -103,7 +103,7 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
             double dens = smoothDensity(x);
             double pres = smoothPressure(x);
 
-            particles.push_back(createParticle(x, dens, pres, 1.2 * mass_per_particle/density_right));
+            particles.push_back(createParticle(x, dens, pres, 1.4 * mass_per_particle/density_right));
         }
 
         // ---- CÁLCULO DE PROPIEDADES FÍSICAS ----
@@ -350,7 +350,7 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
         const double density_left = 1.0;
         const double density_right = 1.0;
         const double pressure_left = 1000.0;
-        const double pressure_right = 10.0e-2;
+        const double pressure_right = 0.01;
         const double x_discontinuity = 0.5 * (x_min + x_max);
 
         // ---- EXTENDER DOMINIO ----
@@ -378,7 +378,7 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
 
         // Elegimos un ancho de transición, por ejemplo la mitad
         double avg_dx = 0.5 * (dx_left + dx_right);
-        double transition_length = 1.0* avg_dx; // Ajusta según te convenga
+        double transition_length = 1.0 * avg_dx; // Ajusta según te convenga
 
         // Función suave para densidad:
         auto smoothDensity = [&](double x) {
@@ -415,7 +415,7 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
             double dens = smoothDensity(x); //density_left;//(x);
             double pres = smoothPressure(x); //pressure_left;//(x);
 
-            particles.push_back(createParticle(x, dens, pres, 1.2 * mass_per_particle/density_left));
+            particles.push_back(createParticle(x, dens, pres, 1.4 * mass_per_particle/density_left));
         }
 
         // Partículas en el lado derecho (incluyendo dominio extendido)
@@ -424,7 +424,7 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
             double dens = smoothDensity(x);
             double pres = smoothPressure(x);
 
-            particles.push_back(createParticle(x, dens, pres, 1.2 * mass_per_particle/density_right));
+            particles.push_back(createParticle(x, dens, pres, 1.4 * mass_per_particle/density_right));
         }
 
         // ---- CÁLCULO DE PROPIEDADES FÍSICAS ----

@@ -155,18 +155,18 @@ void VariableConverter::conservedToPrimitives(Particle& particle, const Equation
 
 double VariableConverter::solvePressure(const Particle& particle, const EquationOfState& eos) const {
     // bracketing + bisección + Newton
-    double P_guess2 = (5.0 / 3.0 - 1.0) * particle.density * particle.specificInternalEnergy;
+    //double P_guess2 = (5.0 / 3.0 - 1.0) * particle.density * particle.specificInternalEnergy;
     double P_guess = particle.pressure;
     double P_sol = root_finding(P_guess, particle, eos, tolerance_);
 
     // Si root_finding devolvió negativo, no se pudo encontrar solución
     if (P_sol < 0.0) {
         logError("solvePressure", "root_finding no pudo converger; intentando con presión calculada", P_guess);
-        P_sol = root_finding(P_guess2, particle, eos, tolerance_);
+        /* P_sol = root_finding(P_guess2, particle, eos, tolerance_);
         if (P_sol < 0.0) {
             logError("solvePressure", "root_finding no pudo converger; P_sol negativo, p_guess", P_guess2);
             return particle.pressure;
-        }
+        } */
     }
     return P_sol;
 }
@@ -358,6 +358,46 @@ double VariableConverter::root_finding(double P_guess, const Particle& particle,
     return pNewton;
 }
 
+double VariableConverter::root_finding2(double P_guess, const Particle& particle,
+                                         const EquationOfState& eos, double tolerance) const {
+    // Se parte de una conjetura inicial robusta
+    double pNewton = std::max(P_guess, 1e-14);
+    const int max_newton = 1000;
+    const double damping = 1.0; // Puedes ajustar este factor si es necesario
+    
+    for (int i = 0; i < max_newton; ++i) {
+        // Evaluar la función y su derivada en pNewton:
+        auto [f_val, df_val] = computeFunctionAndDerivative(pNewton, particle, eos);
+        
+        // Si la derivada es demasiado pequeña, se interrumpe la iteración
+        if (std::fabs(df_val) < 1e-15) {
+            logError("root_finding", "Newton: derivada demasiado pequeña");
+            break;
+        }
+        
+        // Cálculo de la corrección según Newton-Raphson
+        double pNext = pNewton - damping * f_val / df_val;
+        if (pNext <= 1e-14)
+            pNext = 1e-14; // Evitar valores no físicos
+        
+        double rel_step = std::fabs((pNext - pNewton) / std::max(pNewton, 1e-14));
+        pNewton = pNext;
+        
+        // Si se cumple la tolerancia en función y en el paso relativo, se considera convergido
+        if (std::fabs(f_val) < tolerance && rel_step < tolerance)
+            break;
+    }
+    
+    // Verificación final: si no convergió o se obtuvo un valor no físico, se lanza excepción
+    if (pNewton <= 0.0 || std::fabs(computeFunctionAndDerivative(pNewton, particle, eos).first) > 1e8) {
+        throw std::runtime_error("Fallo en la convergencia de presión en root_finding");
+        return -1.0;
+    }
+    
+    return pNewton;
+}
+
+
 std::pair<double, double> VariableConverter::computeFunctionAndDerivative(double P, 
                                                                           const Particle& particle, 
                                                                           const EquationOfState& eos) const {
@@ -437,7 +477,10 @@ std::pair<double, double> VariableConverter::computeFunctionAndDerivative(double
 
     // df/dP = (dP_dn * dn_dP) + (dP_du * du_dP) - 1
     double df_dP = (dP_dn * dn_dP) + (dP_du * du_dP) - 1.0;
+    //double cs2 = (GAMMA-1.0)*GAMMA*u / (1.0+GAMMA*u);
 
+    //double df_dP = (dP_dn * dn_dP) + (dP_du * du_dP) - 1.0;
+    //double df_dP  =MathUtils::vectorNormSquared(particle.velocity)*cs2 -1.0;
     // Comprobar si la derivada es NaN o infinito
     if (std::isnan(df_dP) || std::isinf(df_dP)) {
         logError("computeFunctionAndDerivative", "Error: df_dP es inválido (NaN o infinito)");

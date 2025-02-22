@@ -46,7 +46,6 @@ void Boundaries::applyFixed(std::vector<Particle>& particles) {
     for (size_t i = 0; i < numLeft; ++i) {
         Particle* ghost = ghostParticles[i];
         ghost->velocity = {0.0, 0.0, 0.0}; // Fijar la velocidad a cero
-        // Se puede ajustar la posición u otra variable si fuera necesario.
     }
 
     // Fijar las 5 partículas más a la derecha
@@ -55,7 +54,6 @@ void Boundaries::applyFixed(std::vector<Particle>& particles) {
     for (size_t i = 0; i < numRight; ++i) {
         Particle* ghost = ghostParticles[totalGhosts - 1 - i];
         ghost->velocity = {0.0, 0.0, 0.0}; // Fijar la velocidad a cero
-        // Se puede ajustar la posición u otra variable si fuera necesario.
     }
 }
 

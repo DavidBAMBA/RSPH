@@ -43,7 +43,6 @@ def compute_L2_error(x_num, y_num, x_ana, y_ana):
     
     return L2
 
-
 def solve_relativistic_riemann(rho_L, p_L, v_L, rho_R, p_R, v_R, Gamma, t, x0=0.0, npts=1000):
     """Función envoltorio para el solver analítico relativista."""
     if t <= 0:
@@ -67,7 +66,6 @@ def solve_relativistic_riemann(rho_L, p_L, v_L, rho_R, p_R, v_R, Gamma, t, x0=0.
     
     return xs, states.rho, states.vx, states.pressure, eint_an
 
-
 def plot_data(filename):
     # Leer los datos del CSV con tabulación como separador
     data = pd.read_csv(filename, sep='\\t')
@@ -89,8 +87,8 @@ def plot_data(filename):
     ghost_particles = data[data['        IsGhost'] == 1]
 
     # Condiciones para solver analítico
-    rhoL, pL, vL = 1.0, 1000.0, 0.0   # Ajusta a tus condiciones izq.
-    rhoR, pR, vR = 1.0, 0.001, 0.0  # Ajusta a tus condiciones der.
+    rhoL, pL, vL = 1.0, 1000.0, 0.0   
+    rhoR, pR, vR = 1.0, 0.001, 0.0  
     Gamma = 5.0/3.0
 
     # Solución analítica

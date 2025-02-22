@@ -55,9 +55,9 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
         const double mass_per_particle = total_mass / (N_left + N_right);
         std::cout << " spacing left: " << dx_left << "\n spacing right: " << dx_right << std::endl;
 
-        // Elegimos un ancho de transición, por ejemplo la mitad
+        // Elegimos un ancho de transición
         double avg_dx = 0.5 * (dx_left + dx_right);
-        double transition_length = 1.0 * avg_dx; // Ajusta según te convenga
+        double transition_length = 1.0 * avg_dx;
 
         // Función suave para densidad:
         auto smoothDensity = [&](double x) {
@@ -378,7 +378,7 @@ void InitialConditions::initializeParticles(std::vector<Particle>& particles,
 
         // Elegimos un ancho de transición, por ejemplo la mitad
         double avg_dx = 0.5 * (dx_left + dx_right);
-        double transition_length = 1.0 * avg_dx; // Ajusta según te convenga
+        double transition_length = 1.0 * avg_dx; 
 
         // Función suave para densidad:
         auto smoothDensity = [&](double x) {

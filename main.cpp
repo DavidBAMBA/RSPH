@@ -11,7 +11,7 @@
 int main() {
     try {
         // Definir parámetros
-        int N = 800;          // Número de partículas
+        int N = 500;          // Número de partículas
         double x_min = -0.4;
         double x_max =  0.4;
         BoundaryType boundaryType = BoundaryType::FIXED; 

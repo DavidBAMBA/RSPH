@@ -2,7 +2,7 @@
 #include "Kernel.h"
 #include <cmath>
 #include <algorithm>
-#include "MathUtils.h"  // Si lo usas para gradiente, etc.
+#include "MathUtils.h"  
 
 Kernel::Kernel(KernelType type) {
     configureKernel(type);
@@ -28,7 +28,7 @@ double Kernel::dWdh(double r, double h) const {
 }
 
 double Kernel::F(double q, double h) const {
-    // F = sigma/h^2 * df/dq (como ejemplo; ajusta según tu notación)
+    // F = sigma/h^2 * df/dq
     return (computeSigma() / (h * h)) * df(q);
 }
 

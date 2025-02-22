@@ -517,7 +517,7 @@ void Simulation::run(double endTime) {
             writeOutputCSV(filename);
         }
 
-        double dt = calculateTimeStep();
+        double dt = calculateTimeStep()/10.0;
         
         //double dt2 = calculateTimeStep2();
         //double dt = std::min(dt1,dt2);

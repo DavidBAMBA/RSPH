@@ -27,7 +27,6 @@ double EquationOfState::calculatePressure(double density,
 // ----------------------------------------------------------
 // 2) Velocidad del sonido relativista (simplificada)
 //    c_s^2 = Gamma * P / [ rho*(1 + u) + P ]
-//    donde 'rho' = density, 'u' = specificInternalEnergy
 // ----------------------------------------------------------
 double EquationOfState::calculateSoundSpeed(double density,
                                             double specificInternalEnergy) const

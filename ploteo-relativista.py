@@ -46,7 +46,7 @@ def compute_L2_error(x_num, y_num, x_ana, y_ana):
 def solve_relativistic_riemann(rho_L, p_L, v_L, rho_R, p_R, v_R, Gamma, t, x0=0.0, npts=1000):
     """Función envoltorio para el solver analítico relativista."""
     if t <= 0:
-        return np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
+        return np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
     
     stateL = srrp.State(rho=rho_L, pressure=p_L, vx=v_L, vt=0)
     stateR = srrp.State(rho=rho_R, pressure=p_R, vx=v_R, vt=0)
@@ -59,12 +59,16 @@ def solve_relativistic_riemann(rho_L, p_L, v_L, rho_R, p_R, v_R, Gamma, t, x0=0.
     try:
         states = solution.getState(xis)
     except:
-        return np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
+        return np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
     
     # Calcular energía interna específica (ε = p/((Γ-1)ρ))
     eint_an = states.pressure/((Gamma - 1.0)*states.rho)
     
-    return xs, states.rho, states.vx, states.pressure, eint_an
+    # Calcular densidad conservada analítica D = ργ
+    gamma_an = 1.0/np.sqrt(1.0 - states.vx**2)  # Factor de Lorentz
+    D_an = states.rho * gamma_an  # Densidad conservada
+    
+    return xs, states.rho, states.vx, states.pressure, eint_an, D_an
 
 def plot_data(filename):
     # Leer los datos del CSV con tabulación como separador
@@ -87,69 +91,57 @@ def plot_data(filename):
     ghost_particles = data[data['        IsGhost'] == 1]
 
     # Condiciones para solver analítico
-    rhoL, pL, vL = 1.0, 1000.0, 0.0   
-    rhoR, pR, vR = 1.0, 0.001, 0.0  
+    rhoL, pL, vL = 10.0, 40000.0 / 3.0, 0.0   
+    rhoR, pR, vR = 1.0, 10e-6, 0.0  
     Gamma = 5.0/3.0
 
-    # Solución analítica
-    x_an, rho_an, vel_an, pres_an, eint_an = solve_relativistic_riemann(
+    # Solución analítica (ahora incluye D_an)
+    x_an, rho_an, vel_an, pres_an, eint_an, D_an = solve_relativistic_riemann(
         rhoL, pL, vL, rhoR, pR, vR, Gamma, time
     )
-
+    
     # === Gráfico 1: Velocidad vs Posición ===
+
     axs[0, 0].scatter(real_particles['  x'], real_particles['        vx'], 
-                     s=1, c='blue', label='SPH (reales)')
-    axs[0, 0].scatter(ghost_particles['  x'], ghost_particles['        vx'], 
-                     s=1, c='black', label='SPH (fantasma)')
+                     s=2, c='b', label='Simulation')
+
     if len(x_an) > 0:
-        axs[0, 0].plot(x_an, vel_an, 'k', lw=2, label='Analítico')
-    axs[0, 0].set_title(f'Velocidad vs Posición (Paso {step}, t={time:.4f})')
+        axs[0, 0].plot(x_an, vel_an, 'k', lw=1, label='Analytic')
     axs[0, 0].set_xlabel('x')
-    axs[0, 0].set_ylabel('vx')
-    axs[0, 0].set_xlim(-0.5, 0.5)
+    axs[0, 0].set_ylabel(r'$v_x$')
+    axs[0, 0].set_xlim(-0.4, 0.4)
     axs[0, 0].legend()
 
     # === Gráfico 2: Presión vs Posición ===
     axs[0, 1].scatter(real_particles['  x'], real_particles['        P'], 
-                     s=1, c='red', label='SPH (reales)')
-    axs[0, 1].scatter(ghost_particles['  x'], ghost_particles['        P'], 
-                     s=1, c='black', label='SPH (fantasma)')
-    if len(x_an) > 0:
-        axs[0, 1].plot(x_an, pres_an, 'k', lw=2, label='Analítico')
-    axs[0, 1].set_title(f'Presión vs Posición (Paso {step}, t={time:.4f})')
-    axs[0, 1].set_xlabel('x')
-    axs[0, 1].set_xlim(-0.5, 0.5)
+                     s=2, c='b', label='Simulation')
 
+    if len(x_an) > 0:
+        axs[0, 1].plot(x_an, pres_an, 'k', lw=1, label='Analytic')
+    axs[0, 1].set_xlabel('x')
+    axs[0, 1].set_xlim(-0.4, 0.4)
     axs[0, 1].set_ylabel('P')
     axs[0, 1].legend()
 
-
     # === Gráfico 3: Energía Interna vs Posición ===
     axs[1, 0].scatter(real_particles['  x'], real_particles['        u'], 
-                     s=1, c='green', label='SPH (reales)')
-    axs[1, 0].scatter(ghost_particles['  x'], ghost_particles['        u'], 
-                     s=1, c='black', label='SPH (fantasma)')
+                     s=2, c='b', label='Simulation')
     if len(x_an) > 0:
-        axs[1, 0].plot(x_an, eint_an, 'k', lw=2, label='Analítico')
-    axs[1, 0].set_title(f'Energía Interna vs Posición (Paso {step}, t={time:.4f})')
+        axs[1, 0].plot(x_an, eint_an, 'k', lw=1, label='Analytic')
     axs[1, 0].set_xlabel('x')
-    axs[1, 0].set_xlim(-0.5, 0.5)
-
+    axs[1, 0].set_xlim(-0.4, 0.4)
     axs[1, 0].set_ylabel('u')
     axs[1, 0].legend()
 
-    # === Gráfico 4: Densidad vs Posición ===
-    axs[1, 1].scatter(real_particles['  x'], real_particles['        N'], 
-                     s=1, c='purple', label='SPH (reales)')
-    axs[1, 1].scatter(ghost_particles['  x'], ghost_particles['        N'], 
-                     s=1, c='black', label='SPH (fantasma)')
-    if len(x_an) > 0:
-        axs[1, 1].plot(x_an, rho_an, 'k', lw=2, label='Analítico')
-    axs[1, 1].set_title(f'Densidad vs Posición (Paso {step}, t={time:.4f})')
-    axs[1, 1].set_xlabel('x')
-    axs[1, 1].set_xlim(-0.5, 0.5)
+    # === Gráfico 4: Densidad Conservada vs Posición ===
+    axs[1, 1].scatter(real_particles['  x'], real_particles['        N'],  # Cambiado 'd' por 'N'
+                     s=2, c='b', label='Simulation')
 
-    axs[1, 1].set_ylabel('rho')
+    if len(x_an) > 0:
+        axs[1, 1].plot(x_an, D_an, 'k', lw=1, label='Analytic')  # Usamos D_an
+    axs[1, 1].set_xlabel('x')
+    axs[1, 1].set_xlim(-0.4, 0.4)
+    axs[1, 1].set_ylabel('N')
     axs[1, 1].legend()
 
     plt.tight_layout()
@@ -157,9 +149,8 @@ def plot_data(filename):
     plt.close()
 
     ###########################################################
-    # Cálculo y reporte del error L2 (ejemplo en cada variable)
+    # Cálculo y reporte del error L2 (ahora incluye densidad conservada)
     ###########################################################
-    # Solo partículas reales para comparar con la solución exacta
     x_r = real_particles['  x'].to_numpy()
     
     # Velocidad
@@ -174,26 +165,25 @@ def plot_data(filename):
     u_r = real_particles['        u'].to_numpy()
     L2_u = compute_L2_error(x_r, u_r, x_an, eint_an) if len(x_an) else np.nan
     
-    # Densidad (ten en cuenta que en tus datos se llama 'N', ajústalo si es la densidad real)
-    # Si 'N' es la densidad numérica, procede, si no, ajusta a la columna correspondiente
-    rho_r = real_particles['        N'].to_numpy()
-    L2_rho = compute_L2_error(x_r, rho_r, x_an, rho_an) if len(x_an) else np.nan
+    # Densidad Conservada (N vs D_an)
+    N_r = real_particles['        N'].to_numpy()  # Cambiado 'd' por 'N'
+    L2_N = compute_L2_error(x_r, N_r, x_an, D_an) if len(x_an) else np.nan  # Comparación con D_an
     
     print(f"Paso {step} | t={time:.4f}:")
     print(f"  -> L2(vx)   = {L2_vx:.6f}")
     print(f"  -> L2(P)    = {L2_p:.6f}")
     print(f"  -> L2(u)    = {L2_u:.6f}")
-    print(f"  -> L2(rho)  = {L2_rho:.6f}")
+    print(f"  -> L2(D)    = {L2_N:.6f}")  # Cambiado de rho a D
     
 def main():
     # Obtener lista de archivos CSV que coinciden con el patrón
-    csv_files = glob.glob('outputs/output_step_*.csv')
+    csv_files = glob.glob('data/outputs/output_step_*.csv')
     
     # Ordenar por número de paso
     csv_files.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1]))
     
     # Filtrar archivos cuyos pasos son múltiplos de 100 (ajusta si gustas)
-    csv_files = [f for f in csv_files if int(os.path.splitext(os.path.basename(f))[0].split('_')[-1]) % 100 == 0]
+    csv_files = [f for f in csv_files if int(os.path.splitext(os.path.basename(f))[0].split('_')[-1]) % 1000 == 0]
     
     # Crear carpeta para guardar las imágenes
     os.makedirs('plots', exist_ok=True)

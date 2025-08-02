@@ -21,7 +21,7 @@ int main() {
         auto initialConditions = std::make_shared<InitialConditions>();
 
         // Aquí es donde escoges el tipo de condición inicial que quieres:
-        initialConditions->setInitialConditionType(InitialConditionType::TEST_SB);
+        initialConditions->setInitialConditionType(InitialConditionType::TEST_RSOD);
         // TEST_RSOD          t = 0.35
         // TEST_RSOD2         t = 0.35
         // TEST_RSOD2         t = 0.2
@@ -46,7 +46,7 @@ int main() {
         double fixed_h = 0.009;      
         bool use_fixed_h = false;
 
-        double endTime = 0.35;
+        double endTime = 0.1;
 
         // Crear la simulación con todos los objetos necesarios
         Simulation sim(kernel, eos, dissipation, initialConditions,

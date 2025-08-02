@@ -513,12 +513,18 @@ void Simulation::run(double endTime) {
 
     while (current_time < endTime) {
         std::string filename = "output_step_" + std::to_string(step) + ".csv";
-        if (step % 50 == 0){
-            writeOutputCSV(filename);
-        }
 
         double dt = calculateTimeStep()/10.0;
-        
+        if (step % 100 == 0){
+            writeOutputCSV(filename);
+
+            std::cout  << "---------------------------------------------------------------------------\n"
+                       << " \t STEP: " << step 
+                       << "\t dt: " << dt 
+                       << "\t time: " << current_time << "\n"
+                       << "---------------------------------------------------------------------------\n";
+        }
+
         //double dt2 = calculateTimeStep2();
         //double dt = std::min(dt1,dt2);
         int retries = 0;
@@ -564,11 +570,6 @@ void Simulation::run(double endTime) {
             //std::cout << msg;
             //g_logger->log(msg);
 
-            std::cout  << "---------------------------------------------------------------------------\n"
-                       << " \t STEP: " << step 
-                       << "\t dt: " << dt 
-                       << "\t time: " << current_time << "\n"
-                       << "---------------------------------------------------------------------------\n";
             // Guardar invariantes en un archivo aparte
 
             appendInvariantsToFile("invariants.txt", current_time, step);

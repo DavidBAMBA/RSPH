@@ -91,8 +91,8 @@ def plot_data(filename):
     ghost_particles = data[data['        IsGhost'] == 1]
 
     # Condiciones para solver analítico
-    rhoL, pL, vL = 10.0, 40000.0 / 3.0, 0.0   
-    rhoR, pR, vR = 1.0, 10e-6, 0.0  
+    rhoL, pL, vL = 10.0, 40.0 / 3.0, 0.0   
+    rhoR, pR, vR = 1.0, 10e-5, 0.0  
     Gamma = 5.0/3.0
 
     # Solución analítica (ahora incluye D_an)
@@ -177,13 +177,13 @@ def plot_data(filename):
     
 def main():
     # Obtener lista de archivos CSV que coinciden con el patrón
-    csv_files = glob.glob('data/outputs/output_step_*.csv')
+    csv_files = glob.glob('outputs/output_step_*.csv')
     
     # Ordenar por número de paso
     csv_files.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1]))
     
     # Filtrar archivos cuyos pasos son múltiplos de 100 (ajusta si gustas)
-    csv_files = [f for f in csv_files if int(os.path.splitext(os.path.basename(f))[0].split('_')[-1]) % 1000 == 0]
+    csv_files = [f for f in csv_files if int(os.path.splitext(os.path.basename(f))[0].split('_')[-1]) % 10 == 0]
     
     # Crear carpeta para guardar las imágenes
     os.makedirs('plots', exist_ok=True)

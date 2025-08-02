@@ -63,8 +63,6 @@ private:
     bool validateParticles() const;
 
     // Función helper para integrar una copia del estado usando RK2 o TVD3.
-    // La bandera useRK3 = true indica que se utiliza el integrador de orden tres TVD (KVD3),
-    // mientras que false se usa el método RK2.
     void integrateState(std::vector<Particle>& state, double dt, bool useRK3, VariableConverter& converter) const;
     //td::vector<Particle> getNeighbors1(const Particle& particle) const;{
     

@@ -1,34 +1,47 @@
-# Makefile para el proyecto SPH Shock Tube
+# =============================
+# Variables de carpeta
+# =============================
+SRC_DIR    := src
+CORE_DIR   := $(SRC_DIR)/core
+IC_DIR     := $(SRC_DIR)/ic
+BNDRY_DIR  := $(SRC_DIR)/boundaries
+MAIN_DIR   := $(SRC_DIR)/main
+INCLUDE_DIR := include
 
-# Compilador y banderas
-CXX = g++ -fopenmp
-CXXFLAGS = -std=c++17 -Wall -O2
-
-# Directorio de los archivos fuente y de encabezado
-SRC_DIR = .
-INC_DIR = .
-
+# =============================
 # Archivos fuente
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+# =============================
+CORE_SRCS   := $(wildcard $(CORE_DIR)/*.cpp)
+IC_SRCS     := $(wildcard $(IC_DIR)/*.cpp)
+BNDRY_SRCS  := $(wildcard $(BNDRY_DIR)/*.cpp)
+MAIN_SRCS   := $(wildcard $(MAIN_DIR)/*.cpp)
 
-# Archivos objeto
-OBJS = $(SRCS:.cpp=.o)
+SRCS := $(CORE_SRCS) $(IC_SRCS) $(BNDRY_SRCS) $(MAIN_SRCS)
+OBJS := $(SRCS:.cpp=.o)
 
-# Ejecutable
-TARGET = simulacion
+# =============================
+# Compilador
+# =============================
+CXX := g++
+CXXFLAGS := -std=c++17 -O3 -Wall -Wextra -fopenmp \
+    -I$(CORE_DIR) \
+    -I$(IC_DIR) \
+    -I$(BNDRY_DIR) \
+    -I$(MAIN_DIR) \
+    -I$(INCLUDE_DIR)
 
-# Regla por defecto
+# =============================
+# Target principal
+# =============================
+TARGET := rsph
+
 all: $(TARGET)
 
-# Regla para el ejecutable
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+	$(CXX) $(OBJS) -o $@ $(CXXFLAGS)
 
-# Regla para los archivos objeto
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c $< -o $@
-
-# Limpiar archivos objeto y ejecutable
+# =============================
+# Limpieza
+# =============================
 clean:
-	rm -f $(OBJS) $(TARGET) 
-	rm -rf outputs plots
+	rm -f $(OBJS) $(TARGET)

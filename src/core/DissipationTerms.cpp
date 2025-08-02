@@ -140,7 +140,7 @@ std::pair<double, double> DissipationTerms::Viscosity_LiptaiPrice2018(const Part
     double v_sig_b = ( cs_b + std::fabs(v_ab_star) ) / (1.0 + cs_b * std::fabs(v_ab_star)) ;
 
     // Término disipativo Pi_ab
-    double ALPHA = 0.5;
+    double ALPHA = 1.0;
     double q_a =  0.5 * ALPHA * N_a * v_sig_a * entalpy_a * S_ab_start;
     double q_b =  0.5 * ALPHA * N_b * v_sig_b * entalpy_b * S_ab_start;
         
